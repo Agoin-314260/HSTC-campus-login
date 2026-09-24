@@ -1,0 +1,9 @@
+# 运行依赖（Python 3.9+，Windows 10/11）
+requests
+pycryptodome
+customtkinter
+winotify
+pillow
+
+# 打包依赖（仅打包 exe 时需要）
+pyinstaller

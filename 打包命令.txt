@@ -1,0 +1,14 @@
+打包步骤（在本目录打开命令行执行）：
+
+1. 安装依赖：
+   pip install -r requirements.txt
+
+2. 打包为单个 exe（赞赏码.jpg 会一起打包进 exe）：
+   pyinstaller --onefile --windowed --name 校园网登录器 --add-data "赞赏码.jpg;." main.py
+
+3. 打包产物在 dist\校园网登录器.exe，把它单独复制到任意文件夹即可使用
+   （账号密码加密保存在当前用户注册表里，磁盘上不会产生任何凭证文件）
+
+说明：
+- 双击 exe       = 打开图形界面
+- exe --silent   = 静默后台登录（自启动任务计划用的就是这个参数，登录完自动退出，不占后台）
