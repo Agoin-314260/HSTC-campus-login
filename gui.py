@@ -109,13 +109,18 @@ class 登录界面:
         # ===== 赞赏码与反馈（固定在窗口底部） =====
         底部框架 = ctk.CTkFrame(主框架, fg_color="transparent")
         底部框架.pack(side="bottom", pady=(10, 0))
-        赞赏图 = Image.open(_资源路径("赞赏码.jpg"))
-        # 原图 902×698：中部为正方形识别图案，底部为黑底配文区。
-        # 裁出识别图案（含四周白边），保证按正方形缩放时扫码图案完整占满不变形
-        赞赏图 = 赞赏图.crop((220, 68, 676, 524))
-        self.赞赏码图 = ctk.CTkImage(light_image=赞赏图, dark_image=赞赏图,
-                                     size=(180, 180))
-        ctk.CTkLabel(底部框架, image=self.赞赏码图, text="").pack()
+        try:
+            赞赏图 = Image.open(_资源路径("赞赏码.jpg"))
+            # 原图 902×698：中部为正方形识别图案，底部为黑底配文区。
+            # 裁出识别图案（含四周白边），保证按正方形缩放时扫码图案完整占满不变形
+            赞赏图 = 赞赏图.crop((220, 68, 676, 524))
+            self.赞赏码图 = ctk.CTkImage(light_image=赞赏图, dark_image=赞赏图,
+                                         size=(180, 180))
+            ctk.CTkLabel(底部框架, image=self.赞赏码图, text="").pack()
+        except Exception:
+            # 图片缺失不影响使用（源码运行场景），显示占位文字
+            ctk.CTkLabel(底部框架, text="（赞赏码图片缺失）",
+                         text_color=_提示色).pack()
 
         反馈链接 = ctk.CTkLabel(底部框架, text="有问题可以打赏备注反馈或者GitHub反馈",
                                text_color=_提示色, cursor="hand2",
@@ -227,6 +232,7 @@ class 登录界面:
             if 账号 != self._已保存账号():
                 messagebox.showwarning("登录失败", "账号已修改，请同时输入该账号的密码")
                 return
+            密码 = None  # 标记：线程内改用已保存凭证
         else:
             if not self.校验账号格式(账号):
                 messagebox.showwarning("登录失败", "账号格式不正确（12位数字）")
@@ -235,20 +241,21 @@ class 登录界面:
                 messagebox.showwarning("登录失败", "请输入密码")
                 return
         self._显示加载中("正在登录校园网……")
-        threading.Thread(target=self._后台登录, daemon=True).start()
+        # 账号密码在主线程取好再传入：Tkinter 控件只允许主线程访问，
+        # 且避免校验后、线程启动前用户改动输入框导致校验被绕过
+        threading.Thread(target=self._后台登录, args=(账号, 密码),
+                         daemon=True).start()
 
-    def _后台登录(self):
+    def _后台登录(self, 账号, 密码):
         try:
-            密码 = self.密码输入框.get()
-            if 密码 == _密码占位:
+            if 密码 is None:
+                # 密码框未改动：使用已保存的凭证
                 凭证 = 凭证存储.读取凭证()
                 if 凭证 is None:
                     self.根窗口.after(0, lambda: messagebox.showwarning(
                         "登录失败", "未找到已保存的凭证，请输入账号密码并保存"))
                     return
                 账号, 密码 = 凭证
-            else:
-                账号 = self.账号输入框.get()
 
             结果, 说明 = 登录核心.登录(账号, 密码)
 
