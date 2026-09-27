@@ -28,7 +28,7 @@
 pip install -r requirements.txt
 
 python main.py            # 图形界面
-python main.py --silent   # 静默登录（无界面，成功/已在线/非校园网退出码 0，失败 1）
+python main.py --silent   # 静默登录（无界面，成功/已在线/非校园网/未保存凭证退出码 0，失败 1）
 ```
 
 要求 Python 3.9+、Windows 10/11。
@@ -36,10 +36,10 @@ python main.py --silent   # 静默登录（无界面，成功/已在线/非校�
 ## 打包 exe
 
 ```bash
-pyinstaller --onefile --windowed --name 校园网登录器 --add-data "赞赏码.jpg;." main.py
+pyinstaller --onefile --windowed --name 校园网登录器 --icon 软件图标.ico --add-data "赞赏码.jpg;." --add-data "通知图标.png;." --add-data "软件图标.ico;." main.py
 ```
 
-打包产物在 `dist\校园网登录器.exe`，单独复制到任意文件夹即可使用。
+打包产物在 `dist\校园网登录器.exe`，单独复制到任意文件夹即可使用。exe 文件、窗口标题栏、任务栏均显示软件图标，系统通知显示通知图标。
 
 ## 工作原理（登录实现方法）
 
@@ -92,8 +92,10 @@ pyinstaller --onefile --windowed --name 校园网登录器 --add-data "赞赏码
 | login_core.py | CAS 认证流程 |
 | credential_storage.py | DPAPI 加密 + 注册表存取（含旧版凭证自动迁移） |
 | autostart_manager.py | 任务计划的注册/查询/取消 |
-| notifier.py | Windows 通知（登录成功/失败提醒） |
+| notifier.py | Windows 通知（登录成功/失败提醒，带通知图标） |
 | 赞赏码.jpg | 随 exe 打包的赞赏码图片（界面底部展示） |
+| 软件图标.jpg / 软件图标.ico | 软件图标原图与多尺寸 ico（exe / 标题栏 / 任务栏） |
+| 通知图标.png | 随 exe 打包的系统通知图标 |
 
 ## 赞赏
 
