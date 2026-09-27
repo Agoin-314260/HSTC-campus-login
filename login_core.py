@@ -11,6 +11,7 @@
 - 去掉 BeautifulSoup / rsa 依赖，用正则 + pycryptodome 替代
 """
 import re
+import time
 import uuid
 import base64
 import socket
@@ -52,6 +53,16 @@ def 是否在校园网():
         return 响应.status_code == 200
     except Exception:
         return False
+
+
+def 等待校园网(最长等待秒, 间隔秒=3):
+    """刚唤醒或刚联网时网络可能还没就绪，在限定时间内重复检测"""
+    截止 = time.monotonic() + 最长等待秒
+    while not 是否在校园网():
+        if time.monotonic() >= 截止:
+            return False
+        time.sleep(间隔秒)
+    return True
 
 
 def 获取本机IP():
@@ -120,10 +131,10 @@ def _加密密码(密码, 公钥文本):
     return "__RSA__" + base64.b64encode(密文字节).decode("utf-8")
 
 
-def 登录(账号, 密码):
+def 登录(账号, 密码, 等待网络秒=0):
     """执行完整登录流程，返回 (结果, 说明)。
     结果取值：成功 / 已在线 / 非校园网 / 失败"""
-    if not 是否在校园网():
+    if not 等待校园网(等待网络秒):
         return 非校园网, "当前不在校园网环境，无需登录"
 
     会话 = requests.Session()
