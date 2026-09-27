@@ -25,7 +25,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: 打包 exe
-        run: pyinstaller --onefile --windowed --noconfirm --name 校园网登录器 --add-data "赞赏码.jpg;." main.py
+        run: pyinstaller --onefile --windowed --noconfirm --name 校园网登录器 --icon 软件图标.ico --add-data "赞赏码.jpg;." --add-data "通知图标.png;." --add-data "软件图标.ico;." main.py
 
       - name: 上传构建产物
         uses: actions/upload-artifact@v4

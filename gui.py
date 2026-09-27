@@ -41,8 +41,13 @@ class 登录界面:
     def __init__(self, 根窗口):
         self.根窗口 = 根窗口
         self.根窗口.title("校园网登录器")
-        self.根窗口.geometry("420x650")
+        self.根窗口.geometry("440x700")
         self.根窗口.resizable(False, False)
+        # 标题栏与任务栏使用软件图标（.ico 随 exe 打包）
+        try:
+            self.根窗口.iconbitmap(_资源路径("软件图标.ico"))
+        except Exception:
+            pass  # 图标缺失时用默认样式，不影响功能
 
         # ===== 主容器 =====
         主框架 = ctk.CTkFrame(根窗口)

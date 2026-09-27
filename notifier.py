@@ -5,14 +5,31 @@
 用于静默自动登录的结果提醒：成功用提醒音、失败用默认音，方便用户区分；
 通知失败不影响登录主流程。
 """
+import os
+import sys
+
 from winotify import Notification, audio
+
+
+def _资源路径(文件名):
+    """获取随程序打包的数据文件路径（PyInstaller onefile 运行时解压到临时目录）"""
+    if getattr(sys, "frozen", False):
+        return os.path.join(sys._MEIPASS, 文件名)
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), 文件名)
+
+
+def _图标参数():
+    """通知图标（随程序打包的 通知图标.png）；文件缺失时返回空串用默认样式"""
+    路径 = _资源路径("通知图标.png")
+    return 路径 if os.path.exists(路径) else ""
 
 
 def 弹出通知(标题, 内容):
     """弹出系统通知（默认提示音，用于失败等场景）；
     任何异常都静默忽略，保证不影响登录主流程"""
     try:
-        通知 = Notification(app_id="校园网登录器", title=标题, msg=内容)
+        通知 = Notification(app_id="校园网登录器", title=标题, msg=内容,
+                            icon=_图标参数())
         通知.set_audio(audio.Default, loop=False)
         通知.show()
     except Exception:
@@ -23,7 +40,8 @@ def 弹出成功通知(标题, 内容):
     """弹出成功类通知（提醒音，与失败通知区分）；
     任何异常都静默忽略，保证不影响登录主流程"""
     try:
-        通知 = Notification(app_id="校园网登录器", title=标题, msg=内容)
+        通知 = Notification(app_id="校园网登录器", title=标题, msg=内容,
+                            icon=_图标参数())
         通知.set_audio(audio.Reminder, loop=False)
         通知.show()
     except Exception:
@@ -31,5 +49,5 @@ def 弹出成功通知(标题, 内容):
 
 
 if __name__ == "__main__":
-    弹出通知("测试通知", "默认提示音")
-    弹出成功通知("测试成功通知", "提醒音")
+    弹出通知("测试通知", "默认提示音（应显示图标）")
+    弹出成功通知("测试成功通知", "提醒音（应显示图标）")

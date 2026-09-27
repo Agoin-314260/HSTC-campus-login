@@ -3,8 +3,8 @@
 1. 安装依赖：
    pip install -r requirements.txt
 
-2. 打包为单个 exe（赞赏码.jpg 会一起打包进 exe）：
-   pyinstaller --onefile --windowed --name 校园网登录器 --add-data "赞赏码.jpg;." main.py
+2. 打包为单个 exe（赞赏码.jpg、通知图标.png、软件图标.ico 打包进 exe，软件图标.ico 同时作为 exe 应用图标）：
+   pyinstaller --onefile --windowed --name 校园网登录器 --icon 软件图标.ico --add-data "赞赏码.jpg;." --add-data "通知图标.png;." --add-data "软件图标.ico;." main.py
 
 3. 打包产物在 dist\校园网登录器.exe，把它单独复制到任意文件夹即可使用
    （账号密码加密保存在当前用户注册表里，磁盘上不会产生任何凭证文件）
